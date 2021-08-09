@@ -1,9 +1,12 @@
 package com.example.perpetua.services;
 
+import com.example.perpetua.controller.PlaylistController;
 import com.example.perpetua.dto.Song;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponents;
@@ -19,7 +22,7 @@ import java.util.*;
 
 @Service
 public class MusixmatchService {
-
+    final static Logger logger = LoggerFactory.getLogger(PlaylistController.class);
     public Song fetchSong(String lyrics, String apiKey, int index ) {
         Song result = null;
         try {
@@ -60,7 +63,7 @@ public class MusixmatchService {
             }
 
         } catch (Exception e){
-            System.out.println(e.getMessage());
+            logger.warn(e.getMessage());
             return null;
         }
 
