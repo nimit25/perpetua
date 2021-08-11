@@ -23,16 +23,27 @@ import java.util.*;
 @Service
 public class MusixmatchService {
     final static Logger logger = LoggerFactory.getLogger(PlaylistController.class);
-    public Song fetchSong(String lyrics, String apiKey, int index ) {
+    public Song fetchSong(String lyrics, String apiKey) {
         Song result = null;
         try {
-            URI uri = new URIBuilder("https://api.musixmatch.com/ws/1.1/track.search")
-                    .addParameter("format", "jsonp")
-                    .addParameter("callback", "callback")
-                    .addParameter("q_lyrics", lyrics)
-                    .addParameter("quorum_factor", "1")
-                    .addParameter("apikey", apiKey)
-                    .build();
+            URI uri = null;
+            if (lyrics.equalsIgnoreCase("")) {
+                uri = new URIBuilder("https://api.musixmatch.com/ws/1.1/track.search")
+                        .addParameter("format", "jsonp")
+                        .addParameter("callback", "callback")
+                        .addParameter("quorum_factor", "1")
+                        .addParameter("apikey", apiKey)
+                        .build();
+
+            } else {
+                uri = new URIBuilder("https://api.musixmatch.com/ws/1.1/track.search")
+                        .addParameter("format", "jsonp")
+                        .addParameter("callback", "callback")
+                        .addParameter("q_lyrics", lyrics)
+                        .addParameter("quorum_factor", "1")
+                        .addParameter("apikey", apiKey)
+                        .build();
+            }
             URL url = new URL(uri.toString());
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setDoOutput(true);
@@ -47,13 +58,14 @@ public class MusixmatchService {
             in.close();
             con.disconnect();
             String withoutcallback = content.toString().replaceFirst("callback\\(", "") ;
+            logger.info(withoutcallback);
             String res = withoutcallback.substring(0, withoutcallback.length() - 1);
             JSONObject json = new JSONObject(res);
-            String trackName = json.getJSONObject("message").getJSONObject("body").getJSONArray("track_list").getJSONObject(index).getJSONObject("track").getString("track_name");
-            int hasLyrics = json.getJSONObject("message").getJSONObject("body").getJSONArray("track_list").getJSONObject(index).getJSONObject("track").getInt("has_lyrics");
-            String artisitName = json.getJSONObject("message").getJSONObject("body").getJSONArray("track_list").getJSONObject(index).getJSONObject("track").getString("artist_name");
-            int trackId = json.getJSONObject("message").getJSONObject("body").getJSONArray("track_list").getJSONObject(index).getJSONObject("track").getInt("track_id");
-            if (hasLyrics == 1){
+            String trackName = json.getJSONObject("message").getJSONObject("body").getJSONArray("track_list").getJSONObject(0).getJSONObject("track").getString("track_name");
+            int hasLyrics = json.getJSONObject("message").getJSONObject("body").getJSONArray("track_list").getJSONObject(0).getJSONObject("track").getInt("has_lyrics");
+            String artisitName = json.getJSONObject("message").getJSONObject("body").getJSONArray("track_list").getJSONObject(0).getJSONObject("track").getString("artist_name");
+            int trackId = json.getJSONObject("message").getJSONObject("body").getJSONArray("track_list").getJSONObject(0).getJSONObject("track").getInt("track_id");
+            if (hasLyrics == 1 ){
                 String fullLyrics = fetchLyrics(trackId, apiKey);
                 if (fullLyrics.isEmpty()){
                     return null;
