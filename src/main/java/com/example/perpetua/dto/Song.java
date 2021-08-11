@@ -1,7 +1,12 @@
 package com.example.perpetua.dto;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
+@Entity
 public class Song {
+    @Id
     private String title;
     private  String artist;
 
@@ -12,7 +17,7 @@ public class Song {
     public void setLyrics(String lyrics) {
         this.lyrics = lyrics;
     }
-
+    @Column(length = 100000)
     private String lyrics;
 
 
